@@ -25,28 +25,28 @@ type (
 		Stop() error
 	}
 
-	// AppsRunner сервис для запуска приложений в режиме graceful shutdown
-	AppsRunner struct {
+	// Runner сервис для запуска приложений в режиме graceful shutdown
+	Runner struct {
 		apps   []appStruct
 		logger Logger
 	}
 )
 
-// New создает новый экземпляр AppsRunner с указанным логгером.
-func New(logger Logger) *AppsRunner {
-	return &AppsRunner{
+// New создает новый экземпляр Runner с указанным логгером.
+func New(logger Logger) *Runner {
+	return &Runner{
 		apps:   make([]appStruct, 0),
 		logger: logger,
 	}
 }
 
 // RegisterApp регистрирует приложение, реализующее интерфейс app.
-func (r *AppsRunner) RegisterApp(instance app) {
+func (r *Runner) RegisterApp(instance app) {
 	r.RegisterNamedApp("", instance)
 }
 
 // RegisterNamedApp регистрирует приложение с указанным именем.
-func (r *AppsRunner) RegisterNamedApp(name string, instance app) {
+func (r *Runner) RegisterNamedApp(name string, instance app) {
 	r.apps = append(r.apps, appStruct{
 		Name:  name,
 		Start: instance.Start,
@@ -55,7 +55,7 @@ func (r *AppsRunner) RegisterNamedApp(name string, instance app) {
 }
 
 // RegisterShutdownHook регистрирует функцию, которая будет вызвана при остановке приложения.
-func (r *AppsRunner) RegisterShutdownHook(stop callback) {
+func (r *Runner) RegisterShutdownHook(stop callback) {
 	if stop == nil {
 		return
 	}
@@ -66,7 +66,7 @@ func (r *AppsRunner) RegisterShutdownHook(stop callback) {
 	})
 }
 
-func (r *AppsRunner) Run(ctx context.Context) error {
+func (r *Runner) Run(ctx context.Context) error {
 	// Создаем контекст с отменой
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
